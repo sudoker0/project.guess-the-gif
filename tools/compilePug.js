@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -27,29 +18,27 @@ const argparse = new argparse_1.ArgumentParser({
 function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-function render(path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const p = path_1.default.parse(path);
-        if (IGNORED_DIR.test(path))
-            return false;
-        if (!PUG_FILE.test(p.base))
-            return false;
-        try {
-            const content = (0, pug_1.renderFile)(path, {
-                doctype: "html",
-                pretty: false,
-                self: true,
-                string: {}
-            });
-            yield (0, promises_1.writeFile)(`${p.dir}${p.dir == "" ? "" : path_1.default.sep}${p.base.replace(PUG_FILE, ".html")}`, content, { encoding: "utf-8", });
-            console.log("Compiled: " + path);
-        }
-        catch (e) {
-            console.error("Error: An error has occurred which make the process of rendering Pug file into HTML file unable to finish. Detail of the error will be attached below:\n\n", "----------ERROR_LOG_BEGIN----------\n", `AFFECTED_FILE: ${path}\n`, e, "----------ERROR_LOG_END----------\n");
-        }
-    });
+async function render(path) {
+    const p = path_1.default.parse(path);
+    if (IGNORED_DIR.test(path))
+        return false;
+    if (!PUG_FILE.test(p.base))
+        return false;
+    try {
+        const content = (0, pug_1.renderFile)(path, {
+            doctype: "html",
+            pretty: false,
+            self: true,
+            string: {}
+        });
+        await (0, promises_1.writeFile)(`${p.dir}${p.dir == "" ? "" : path_1.default.sep}${p.base.replace(PUG_FILE, ".html")}`, content, { encoding: "utf-8", });
+        console.log("Compiled: " + path);
+    }
+    catch (e) {
+        console.error("Error: An error has occurred which make the process of rendering Pug file into HTML file unable to finish. Detail of the error will be attached below:\n\n", "----------ERROR_LOG_BEGIN----------\n", `AFFECTED_FILE: ${path}\n`, e, "----------ERROR_LOG_END----------\n");
+    }
 }
-(() => __awaiter(void 0, void 0, void 0, function* () {
+(async () => {
     argparse.add_argument("-p", "--path", {
         type: String,
         nargs: "*",
@@ -75,17 +64,17 @@ function render(path) {
         const path = path_1.default.resolve(__dirname + "/" + i);
         if (!(0, fs_1.existsSync)(path))
             continue;
-        const ft = (yield (0, promises_1.lstat)(path));
+        const ft = (await (0, promises_1.lstat)(path));
         if (ft.isDirectory()) {
             good_path.push(path);
-            var queue = yield node_dir_1.default.promiseFiles(path);
+            var queue = await node_dir_1.default.promiseFiles(path);
             for (const f of queue) {
-                yield render(f);
+                await render(f);
             }
         }
         else if (ft.isFile()) {
             good_path.push(path);
-            yield render(path);
+            await render(path);
         }
         else {
             console.log(`Error: File/directory: ${path} does not exist, is not valid or is inaccessible`);
@@ -101,10 +90,10 @@ function render(path) {
                         return skip;
                     return true;
                 },
-            }, (_ev, path) => __awaiter(void 0, void 0, void 0, function* () {
-                yield render(path);
-            }));
+            }, async (_ev, path) => {
+                await render(path);
+            });
         }
     }
-}))();
+})();
 //# sourceMappingURL=compilePug.js.map
