@@ -5,7 +5,7 @@ interface HTMLElement {
     replace(data: Template, prefix?: string): void
 }
 
-const wordlist = "./word_list.txt" //"https://raw.githubusercontent.com/dwyl/english-words/master/words.txt"
+const wordlist = "./google-10000-english-no-swears.txt" //"https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt"
 const max_reset = 5,
     num_of_tag = 12,
     max_good_tag = 5,

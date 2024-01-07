@@ -1,4 +1,4 @@
-const wordlist = "./word_list.txt";
+const wordlist = "./google-10000-english-no-swears.txt";
 const max_reset = 5, num_of_tag = 12, max_good_tag = 5, score_good_tag = 20, score_bad_tag = -40, penality_after = 3;
 var wlist = [];
 var tag_list = [];
